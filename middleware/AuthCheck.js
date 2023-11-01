@@ -3,7 +3,7 @@ const User = require("../models/user");
 
 exports.auth = (req, res, next) => {
   try {
-    const token = req.headers["xyauthtoken"];
+    const token = req.headers["xayongtoken"];
 
     if (!token) {
       return res.status(401).send({
