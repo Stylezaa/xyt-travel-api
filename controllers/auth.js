@@ -12,6 +12,12 @@ exports.CheckHealth = async (req, res) => {
 exports.GetAllUsers = async (req, res) => {
   try {
     const user = await User.find({}).exec();
+    if (user.length === 0) {
+      return res.status(404).send({
+        message: "Not Found Any User",
+        status: 404,
+      });
+    }
     res.status(200).send({
       message: user,
       status: 200,
@@ -29,8 +35,6 @@ exports.Register = async (req, res) => {
   try {
     const { f_name, l_name, phone_number, email, password, role, enabled } =
       req.body;
-
-    console.log(req.body);
 
     let phoneCheck = await User.findOne({ phone_number });
     let emailCheck = await User.findOne({ email });
@@ -143,6 +147,14 @@ exports.GetProfile = async (req, res) => {
       .select("-password")
       .populate("wishlist")
       .exec();
+
+    if (!user) {
+      return res.status(404).send({
+        message: "Not Found This User",
+        status: 404,
+      });
+    }
+
     res.status(200).send({
       message: user,
       status: 200,

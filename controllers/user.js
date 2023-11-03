@@ -58,11 +58,13 @@ exports.UpdatePassword = async (req, res, next) => {
     const existUser = await User.findById(id);
 
     if (!existUser) {
-      return res.status(500).send("This User ID not found");
+      return res.status(404).send({
+        message: "Not Found This User",
+        status: 404,
+      });
     }
 
     let UserOne;
-
     if (password) {
       const salt = await bcrypt.genSalt(5);
       const hashPassword = await bcrypt.hash(password, salt);
@@ -107,9 +109,9 @@ exports.UpdateProfile = async (req, res, next) => {
 
     const existUser = await User.findById(id);
     if (!existUser) {
-      return res.status(503).send({
+      return res.status(404).send({
         message: "This User Not Found",
-        status: 503,
+        status: 404,
       });
     } else {
       await User.updateOne(
@@ -143,9 +145,9 @@ exports.UpdateRole = async (req, res, next) => {
 
     const existUser = await User.findById(id);
     if (!existUser) {
-      return res.status(503).send({
+      return res.status(404).send({
         message: "This User Not Found",
-        status: 503,
+        status: 404,
       });
     } else {
       await User.updateOne(
@@ -228,93 +230,6 @@ exports.DeleteUserById = async (req, res, next) => {
     console.log(error);
     res.status(500).send({
       message: error,
-      status: 500,
-    });
-  }
-};
-
-// Add To WishList
-exports.addToWishList = async (req, res) => {
-  try {
-    //code
-    const { productId } = req.body;
-    await User.findOneAndUpdate(
-      { email: req.user.email },
-      { $addToSet: { wishlist: productId } }
-    ).exec();
-
-    res.status(201).send({
-      message: "Add Product To WishList Successfully",
-      status: 201,
-    });
-  } catch (err) {
-    res.status(500).send({
-      message: err,
-      status: 500,
-    });
-  }
-};
-exports.getWishList = async (req, res) => {
-  try {
-    //code
-    let list = await User.findOne({ email: req.user.email })
-      .select("wishlist")
-      .populate("wishlist")
-      .exec();
-    res.status(201).send({
-      message: list,
-      status: 200,
-    });
-  } catch (err) {
-    res.status(500).send({
-      message: err,
-      status: 500,
-    });
-  }
-};
-
-exports.removeWishListByOne = async (req, res) => {
-  try {
-    const { productId } = req.params;
-
-    const existUser = await User.findOne({ email: req.user.email });
-    if (!existUser) {
-      return res.status(503).send({
-        message: "This User Not Found",
-        status: 503,
-      });
-    }
-    await User.findOneAndUpdate(
-      { email: req.user.email },
-      { $pull: { wishlist: productId } }
-    ).exec();
-
-    res.status(200).send({
-      message: "Remove Product From WishList Successfully",
-      status: 200,
-    });
-  } catch (err) {
-    res.status(500).send({
-      message: err,
-      status: 500,
-    });
-  }
-};
-
-exports.removeWishListAll = async (req, res) => {
-  try {
-    await User.findOneAndUpdate(
-      { email: req.user.email },
-      { wishlist: [] }
-    ).exec();
-
-    res.status(200).send({
-      message: "Remove All Product From WishList Successfully",
-      status: 200,
-    });
-  } catch (err) {
-    res.status(500).send({
-      message: err,
       status: 500,
     });
   }
