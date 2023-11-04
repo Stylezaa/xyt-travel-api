@@ -60,57 +60,97 @@ exports.Insert = async (req, res) => {
       max_tour,
       trip_overview,
       recommend_for,
-      itinerary,
-      pocket_summary,
+      // itinerary
+      title_itinerary,
+      accommodations_itinerary,
+      meals_itinerary,
+      must_try_itinerary,
+      content_itinerary,
+      // pocket_summary
+      title_pocket,
+      activities_pocket,
+      where_to_stay_pocket,
+      meals_pocket,
       booking_policy,
       enabled,
     } = req.body;
 
-    const files1 = req.files["cover_package"];
+    const files1 = req.files["cover"];
     const files2 = req.files["cover_itinerary"];
-    if (!files1 && files2) {
-      return res.status(404).send({
-        message: "Not Found Images",
-        status: 404,
+
+    // console.log("Body = ", req.body);
+    // console.log("File = ", req.files);
+    // console.log("File1 = ", files1);
+    // console.log("File2 = ", files2);
+
+    let ItineraryArray = [];
+    for (let index = 0; index < title_itinerary.length; index++) {
+      ItineraryArray.push({
+        title_itinerary: title_itinerary[index],
+        cover_itinerary: files2[index],
+        accommodations_itinerary: accommodations_itinerary[index],
+        meals_itinerary: meals_itinerary[index],
+        must_try_itinerary: must_try_itinerary[index],
+        content_itinerary: content_itinerary[index],
       });
     }
 
-    let package = new Package({
-      cover,
-      title,
-      price,
-      duration_tour,
-      start_tour,
-      end_tour,
-      meals_tour,
-      cities_tour,
-      min_tour,
-      max_tour,
-      trip_overview,
-      recommend_for,
-      itinerary,
-      pocket_summary,
-      booking_policy,
-      enabled,
-    });
-
-    if (enabled) {
-      package.enabled = req.body.enabled;
-    }
-
-    if (!package) {
-      return res.status(404).send({
-        message: "Not Found Any Data",
-        status: 404,
+    let PocketArray = [];
+    for (let index = 0; index < title_pocket.length; index++) {
+      PocketArray.push({
+        title_pocket: title_pocket[index],
+        activities_pocket: activities_pocket[index],
+        where_to_stay_pocket: where_to_stay_pocket[index],
+        meals_pocket: meals_pocket[index],
       });
     }
 
-    await package.save(); // Save to database
+    console.log("ItineraryArray = ", ItineraryArray);
+    console.log("PocketArray = ", PocketArray);
 
-    res.status(201).send({
-      message: "Insert Product Successfully",
-      status: 201,
-    });
+    // if (!files1 && files2) {
+    //   return res.status(404).send({
+    //     message: "Not Found Images",
+    //     status: 404,
+    //   });
+    // }
+
+    // let package = new Package({
+    //   cover,
+    //   title,
+    //   price,
+    //   duration_tour,
+    //   start_tour,
+    //   end_tour,
+    //   meals_tour,
+    //   cities_tour,
+    //   min_tour,
+    //   max_tour,
+    //   trip_overview,
+    //   recommend_for,
+    //   itinerary,
+    //   pocket_summary,
+    //   booking_policy,
+    //   enabled,
+    // });
+
+    // if (enabled) {
+    //   package.enabled = req.body.enabled;
+    // }
+
+    // if (!package) {
+    //   return res.status(404).send({
+    //     message: "Not Found Any Data",
+    //     status: 404,
+    //   });
+    // }
+
+    // await package.save(); // Save to database
+
+    // res.status(201).send({
+    //   message: "Insert Product Successfully",
+    //   status: 201,
+    // });
   } catch (error) {
     console.log(error);
     res.status(500).send({

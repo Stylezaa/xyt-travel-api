@@ -34,8 +34,8 @@ router.post("/package/get/:id", GetPackageByID);
 router.post(
   "/package/insert",
   upload.fields([
-    { name: "cover_package", maxCount: 1 },
-    { name: "cover_itinerary", maxCount: 1 },
+    { name: "cover", maxCount: 1 },
+    { name: "cover_itinerary", maxCount: 20 },
   ]),
   Insert
 );
