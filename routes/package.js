@@ -9,6 +9,7 @@ const {
   GetPackageAll,
   GetPackageByID,
   Insert,
+  DeletePackageById,
 } = require("../controllers/package");
 
 //Middleware
@@ -30,7 +31,7 @@ router.post("/package/get/:id", GetPackageByID);
 
 //@Endpoint https://localhost:8000/api/package/insert
 //@Method   POST
-//@Access   Publish
+//@Access   Private
 router.post(
   "/package/insert",
   upload.fields([
@@ -39,5 +40,10 @@ router.post(
   ]),
   Insert
 );
+
+//@Endpoint https://localhost:8000/api/package/delete/:id
+//@Method   Delete
+//@Access   Private
+router.delete("/package/delete/:id", DeletePackageById);
 
 module.exports = router;

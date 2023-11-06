@@ -4,6 +4,8 @@ exports.GetPackageAll = async (req, res) => {
   try {
     let package = await Package.find().sort({ createdAt: -1 }).exec();
 
+    const basePath = `${req.protocol}://${req.get("host")}/uploads/packages/`;
+
     if (package.length === 0) {
       return res.status(404).send({
         message: "Not Found Any Package",
@@ -13,6 +15,7 @@ exports.GetPackageAll = async (req, res) => {
 
     res.status(200).send({
       message: package,
+      url: basePath,
       status: 200,
     });
   } catch (error) {
@@ -25,8 +28,8 @@ exports.GetPackageAll = async (req, res) => {
 
 exports.GetPackageByID = async (req, res) => {
   try {
-    const { id } = req.params;
-    let packageOne = await Package.findById(id).exec();
+    const { title } = req.params;
+    let packageOne = await Package.findOne({ title: title }).exec();
     if (!packageOne) {
       return res.status(404).send({
         message: "Not Found This Package",
@@ -48,7 +51,6 @@ exports.GetPackageByID = async (req, res) => {
 exports.Insert = async (req, res) => {
   try {
     const {
-      cover,
       title,
       price,
       duration_tour,
@@ -75,19 +77,26 @@ exports.Insert = async (req, res) => {
       enabled,
     } = req.body;
 
-    const files1 = req.files["cover"];
+    console.log("title_pocket = ", title_pocket);
+
+    const files1 = req.files["cover"][0];
     const files2 = req.files["cover_itinerary"];
 
-    // console.log("Body = ", req.body);
-    // console.log("File = ", req.files);
-    // console.log("File1 = ", files1);
-    // console.log("File2 = ", files2);
+    console.log("files1 = ", files1);
+    console.log("files2 = ", files2);
+
+    if (!files1 || files2.length === 0) {
+      return res.status(404).send({
+        message: "ໄຟຮຮູບພາບບໍ່ຄົບຖ້ວນ",
+        status: 404,
+      });
+    }
 
     let ItineraryArray = [];
-    for (let index = 0; index < title_itinerary.length; index++) {
+    for (let index = 0; index < files2.length; index++) {
       ItineraryArray.push({
         title_itinerary: title_itinerary[index],
-        cover_itinerary: files2[index],
+        cover_itinerary: files2[index].filename,
         accommodations_itinerary: accommodations_itinerary[index],
         meals_itinerary: meals_itinerary[index],
         must_try_itinerary: must_try_itinerary[index],
@@ -108,49 +117,102 @@ exports.Insert = async (req, res) => {
     console.log("ItineraryArray = ", ItineraryArray);
     console.log("PocketArray = ", PocketArray);
 
-    // if (!files1 && files2) {
-    //   return res.status(404).send({
-    //     message: "Not Found Images",
-    //     status: 404,
-    //   });
-    // }
+    let package = new Package({
+      title,
+      price,
+      duration_tour,
+      start_tour,
+      end_tour,
+      meals_tour,
+      cities_tour,
+      min_tour,
+      max_tour,
+      trip_overview,
+      recommend_for,
+      booking_policy,
+      enabled,
+    });
 
-    // let package = new Package({
-    //   cover,
-    //   title,
-    //   price,
-    //   duration_tour,
-    //   start_tour,
-    //   end_tour,
-    //   meals_tour,
-    //   cities_tour,
-    //   min_tour,
-    //   max_tour,
-    //   trip_overview,
-    //   recommend_for,
-    //   itinerary,
-    //   pocket_summary,
-    //   booking_policy,
-    //   enabled,
-    // });
+    await package.save(); // Save to database
 
-    // if (enabled) {
-    //   package.enabled = req.body.enabled;
-    // }
+    if (enabled) {
+      package.enabled = req.body.enabled;
+    }
 
-    // if (!package) {
-    //   return res.status(404).send({
-    //     message: "Not Found Any Data",
-    //     status: 404,
-    //   });
-    // }
+    if (files1) {
+      await Package.updateOne(
+        {
+          _id: package._id,
+        },
+        {
+          cover: files1.filename,
+        }
+      );
+    }
 
-    // await package.save(); // Save to database
+    if (title_itinerary) {
+      for (let index = 0; index < title_itinerary.length; index++) {
+        await Package.updateOne(
+          {
+            _id: package._id,
+          },
+          {
+            itinerary: ItineraryArray,
+          }
+        );
+      }
+    }
 
-    // res.status(201).send({
-    //   message: "Insert Product Successfully",
-    //   status: 201,
-    // });
+    if (title_pocket) {
+      for (let index = 0; index < title_pocket.length; index++) {
+        await Package.updateOne(
+          {
+            _id: package._id,
+          },
+          {
+            pocket_summary: PocketArray,
+          }
+        );
+      }
+    }
+
+    if (!package) {
+      return res.status(404).send({
+        message: "Not Found Any Data",
+        status: 404,
+      });
+    }
+
+    res.status(201).send({
+      message: "Insert Product Successfully",
+      status: 201,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: error,
+      status: 500,
+    });
+  }
+};
+
+exports.DeletePackageById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const dataOne = await Package.deleteOne({ _id: id });
+
+    if (!dataOne) {
+      return res.status(404).send({
+        message: "Not Found This Package Item",
+        status: 404,
+      });
+    }
+
+    res.status(200).send({
+      message: "Delete This Package Successfully",
+      status: 200,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
