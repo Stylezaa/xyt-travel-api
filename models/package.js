@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+// Model
+const Booking = require("../models/booking");
 
 const PackageSchema = new Schema(
   {
@@ -68,6 +70,14 @@ const PackageSchema = new Schema(
       type: String,
       require: true,
     },
+    // User Booking
+    users_booking: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: Booking,
+        require: true,
+      },
+    ],
     enabled: {
       type: Boolean,
       default: true,

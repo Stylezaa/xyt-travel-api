@@ -2,7 +2,10 @@ const Package = require("../models/package");
 
 exports.GetPackageAll = async (req, res) => {
   try {
-    let package = await Package.find().sort({ createdAt: -1 }).exec();
+    let package = await Package.find()
+      .populate({ path: "users_booking" })
+      .sort({ createdAt: -1 })
+      .exec();
 
     const basePath = `${req.protocol}://${req.get("host")}/uploads/packages/`;
 
@@ -29,7 +32,9 @@ exports.GetPackageAll = async (req, res) => {
 exports.GetPackageByID = async (req, res) => {
   try {
     const { title } = req.params;
-    let packageOne = await Package.findOne({ title: title }).exec();
+    let packageOne = await Package.findOne({ title: title })
+      .populate("users_booking")
+      .exec();
     if (!packageOne) {
       return res.status(404).send({
         message: "Not Found This Package",
