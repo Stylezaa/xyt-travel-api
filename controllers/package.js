@@ -4,8 +4,7 @@ exports.GetPackageAll = async (req, res) => {
   try {
     let package = await Package.find()
       .populate({ path: "users_booking" })
-      .sort({ createdAt: -1 })
-      .exec();
+      .sort({ createdAt: -1 });
 
     const basePath = `${req.protocol}://${req.get("host")}/uploads/packages/`;
 

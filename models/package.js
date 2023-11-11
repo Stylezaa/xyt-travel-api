@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-// Model
-const Booking = require("../models/booking");
 
 const PackageSchema = new Schema(
   {
@@ -74,8 +72,7 @@ const PackageSchema = new Schema(
     users_booking: [
       {
         type: Schema.Types.ObjectId,
-        ref: Booking,
-        require: true,
+        ref: "Booking",
       },
     ],
     enabled: {
@@ -86,4 +83,4 @@ const PackageSchema = new Schema(
   { timestamps: true } //Open timestamps
 );
 
-module.exports = Package = mongoose.model("package", PackageSchema); //Export Model
+module.exports = Package = mongoose.model("Package", PackageSchema); //Export Model

@@ -1,11 +1,23 @@
 // Model
 const Booking = require("../models/booking");
 const Package = require("../models/package");
+// Function Random Name Order
+function RandomID(length) {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let randomString = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters.charAt(randomIndex);
+  }
+
+  return randomString;
+}
 
 exports.GetBookingAll = async (req, res) => {
   try {
     let booking = await Booking.find()
-      .populate("package_id")
+      .populate({ path: "package_id" })
       .sort({ createdAt: -1 })
       .exec();
 
@@ -75,6 +87,7 @@ exports.InsertBooking = async (req, res) => {
     console.log("req.body = ", req.body);
 
     let booking = new Booking({
+      booking_number: RandomID(12),
       package_id,
       adults,
       children,

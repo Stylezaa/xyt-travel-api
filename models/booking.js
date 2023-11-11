@@ -1,10 +1,14 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-// // Model
+// Model
 const Package = require("../models/package");
 
 const BookingSchema = new Schema(
   {
+    booking_number: {
+      type: String,
+      require: true,
+    },
     package_id: {
       type: Schema.Types.ObjectId,
       ref: Package,
@@ -74,4 +78,4 @@ const BookingSchema = new Schema(
   { timestamps: true } //Open timestamps
 );
 
-module.exports = Booking = mongoose.model("booking", BookingSchema); //Export Model
+module.exports = Booking = mongoose.model("Booking", BookingSchema); //Export Model
