@@ -1,9 +1,11 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+// Variable
+const SECRET_KEY = process.env.JWT_SECRET;
 
 exports.auth = (req, res, next) => {
   try {
-    const token = req.headers["xayongtoken"];
+    const token = req.headers["xyttoken"];
 
     if (!token) {
       return res.status(401).send({
@@ -12,7 +14,7 @@ exports.auth = (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, "jwtSecret"); // Decode Token to human language
+    const decoded = jwt.verify(token, SECRET_KEY); // Decode Token to human language
     req.user = decoded.user;
     next(); //Process next to Controller
   } catch (error) {
@@ -26,8 +28,8 @@ exports.auth = (req, res, next) => {
 
 exports.AdminCheck = async (req, res, next) => {
   try {
-    const { email } = req.user; //req.user get from auth middleware
-    const AdminUser = await User.findOne({ email }).exec();
+    const { username } = req.user; //req.user get from auth middleware
+    const AdminUser = await User.findOne({ username }).exec();
 
     if (AdminUser.role === "Admin") {
       next(); //Process next to Controller
@@ -41,6 +43,28 @@ exports.AdminCheck = async (req, res, next) => {
     console.log(error);
     res.status(500).send({
       message: "Admin Access denied",
+      status: 500,
+    });
+  }
+};
+
+exports.StaffCheck = async (req, res, next) => {
+  try {
+    const { username } = req.user; //req.user get from auth middleware
+    const StaffUser = await User.findOne({ username }).exec();
+
+    if (StaffUser.role === "Staff") {
+      next(); //Process next to Controller
+    } else {
+      res.status(401).send({
+        message: "Staff Access denied",
+        status: 401,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Staff Access denied",
       status: 500,
     });
   }

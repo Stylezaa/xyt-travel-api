@@ -1,6 +1,8 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+// Variable
+const SECRET_KEY = process.env.JWT_SECRET;
 
 exports.CheckHealth = async (req, res) => {
   res.status(200).send({
@@ -31,61 +33,14 @@ exports.GetAllUsers = async (req, res) => {
   }
 };
 
-exports.Register = async (req, res) => {
-  try {
-    const { f_name, l_name, phone_number, email, password, role, enabled } =
-      req.body;
-
-    let phoneCheck = await User.findOne({ phone_number });
-    let emailCheck = await User.findOne({ email });
-    if (phoneCheck || emailCheck) {
-      return res.status(400).send({
-        message: "ມີເບີໂທ ຫຼື ອີເມວ ຜູ້ໃຊ້ງານນີ້ແລ້ວ",
-        status: 404,
-      });
-    }
-
-    const salt = await bcrypt.genSalt(10); //Generate random string for add to hash password
-    let user = new User({
-      f_name,
-      l_name,
-      phone_number,
-      email,
-      password,
-      role,
-      enabled,
-    });
-
-    // Encrypt Password
-    user.password = await bcrypt.hash(password, salt); // Hash password
-    await user.save(); // Save to database
-
-    res.status(201).send({
-      message: "Register User Successfully",
-      status: 201,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      message: error,
-      status: 500,
-    });
-  }
-};
-
 exports.Login = async (req, res, next) => {
   try {
-    const { phone_number, email, password } = req.body;
+    const { username, password } = req.body;
     //Find User and update timestamp for show last login
-    let user;
-    let ErrorMessage;
-    if (phone_number) {
-      user = await User.findOneAndUpdate({ phone_number }, { new: true });
-      ErrorMessage = "ເບີໂທ ຫຼື ລະຫັດຜ່ານຂອງທ່ານບໍ່ຖືກຕ້ອງ";
-    } else {
-      user = await User.findOneAndUpdate({ email }, { new: true });
-      ErrorMessage = "ອີເມລ ຫຼື ລະຫັດຜ່ານຂອງທ່ານບໍ່ຖືກຕ້ອງ";
-    }
+
+    const user = await User.findOneAndUpdate({ username }, { new: true });
+
+    const basePath = `${req.protocol}://${req.get("host")}/uploads/profiles/`;
 
     if (user && user.enabled === true) {
       //Check Password
@@ -93,7 +48,7 @@ exports.Login = async (req, res, next) => {
 
       if (!isMatch) {
         return res.status(400).send({
-          message: ErrorMessage,
+          message: "ຊື່ ຫຼື ລະຫັດຜ່ານຂອງທ່ານບໍ່ຖືກຕ້ອງ",
           status: 400,
         });
       }
@@ -102,19 +57,21 @@ exports.Login = async (req, res, next) => {
       const payload = {
         user: {
           id: user._id,
+          username: user.username,
           f_name: user.f_name,
           l_name: user.l_name,
           profile_img: user.profile_img,
           phone_number: user.phone_number,
           email: user.email,
           role: user.role,
+          file_url: basePath,
         },
       };
 
       //Generate Token
       jwt.sign(
         payload,
-        "jwtSecret",
+        SECRET_KEY,
         {
           expiresIn: "7d",
         },
@@ -125,7 +82,7 @@ exports.Login = async (req, res, next) => {
       );
     } else {
       return res.status(400).send({
-        message: ErrorMessage,
+        message: "ຊື່ ຫຼື ລະຫັດຜ່ານຂອງທ່ານບໍ່ຖືກຕ້ອງ",
         status: 400,
       });
     }
@@ -145,8 +102,9 @@ exports.GetProfile = async (req, res) => {
     // console.log(req.user) // req.user get from middleware for decode from xyauthtoken
     const user = await User.findOne({ email: req.user.email })
       .select("-password")
-      .populate("wishlist")
       .exec();
+
+    const basePath = `${req.protocol}://${req.get("host")}/uploads/profiles/`;
 
     if (!user) {
       return res.status(404).send({
@@ -157,6 +115,7 @@ exports.GetProfile = async (req, res) => {
 
     res.status(200).send({
       message: user,
+      file_url: basePath,
       status: 200,
     });
   } catch (error) {
