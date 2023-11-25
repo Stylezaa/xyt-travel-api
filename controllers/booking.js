@@ -18,8 +18,7 @@ exports.GetBookingAll = async (req, res) => {
   try {
     let booking = await Booking.find()
       .populate({ path: "package_id" })
-      .sort({ createdAt: -1 })
-      .exec();
+      .sort({ createdAt: -1 });
 
     if (booking.length === 0) {
       return res.status(404).send({
@@ -81,7 +80,8 @@ exports.InsertBooking = async (req, res) => {
       phone_number,
       country,
       city,
-      social_media,
+      whatsapp,
+      facebook,
     } = req.body;
 
     console.log("req.body = ", req.body);
@@ -103,6 +103,8 @@ exports.InsertBooking = async (req, res) => {
       country,
       city,
       social_media,
+      whatsapp,
+      facebook,
     });
 
     await booking.save(); // Save to database
@@ -161,6 +163,44 @@ exports.DeleteBookingById = async (req, res, next) => {
 
     res.status(200).send({
       message: "Delete This Booking Successfully",
+      status: 200,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: error,
+      status: 500,
+    });
+  }
+};
+
+// Change Status Booking
+exports.ChangeStatusBooking = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const { status } = req.body;
+
+    // Check ID has found ?
+    const ExistBooking = await Booking.findById(id);
+    if (!ExistBooking) {
+      return res.status(404).send({
+        message: "ບໍ່ພົບລາຍການນີ້",
+        status: 404,
+      });
+    }
+
+    await Booking.updateOne(
+      {
+        _id: id,
+      },
+      {
+        status: status,
+      }
+    );
+
+    res.status(200).json({
+      message: "ບັນທຶກສະຖານະສໍາເລັດ",
       status: 200,
     });
   } catch (error) {

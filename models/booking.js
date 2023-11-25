@@ -66,9 +66,18 @@ const BookingSchema = new Schema(
       type: String,
       require: true,
     },
-    social_media: {
+    whatsapp: {
       type: String,
       require: true,
+    },
+    facebook: {
+      type: String,
+      require: true,
+    },
+    status: {
+      type: String,
+      require: true,
+      default: "ລໍຖ້າການຊໍາລະເງິນ",
     },
     enabled: {
       type: Boolean,

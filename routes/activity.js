@@ -33,13 +33,7 @@ router.get("/activity/get/:id", auth, GetActivityByID);
 //@Endpoint https://localhost:4000/api/activity/insert
 //@Method   POST
 //@Access   Private
-router.post(
-  "/activity/insert",
-  auth,
-  AdminCheck,
-  upload.single("cover"),
-  InsertActivity
-);
+router.post("/activity/insert", auth, upload.single("cover"), InsertActivity);
 
 //@Endpoint https://localhost:4000/api/activity/update/:id
 //@Method   PATCH
@@ -47,7 +41,6 @@ router.post(
 router.patch(
   "/activity/update/:id",
   auth,
-  AdminCheck,
   upload.single("cover"),
   UpdateActivity
 );
@@ -55,6 +48,6 @@ router.patch(
 //@Endpoint https://localhost:4000/api/activity/delete/:id
 //@Method   DELETE
 //@Access   Private
-router.delete("/activity/delete/:id", auth, AdminCheck, DeleteActivityByID);
+router.delete("/activity/delete/:id", auth, DeleteActivityByID);
 
 module.exports = router;
