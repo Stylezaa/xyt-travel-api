@@ -99,7 +99,6 @@ exports.Login = async (req, res, next) => {
 
 exports.GetProfile = async (req, res) => {
   try {
-    // console.log(req.user) // req.user get from middleware for decode from xyauthtoken
     const user = await User.findOne({ email: req.user.email })
       .select("-password")
       .exec();

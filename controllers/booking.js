@@ -84,8 +84,6 @@ exports.InsertBooking = async (req, res) => {
       facebook,
     } = req.body;
 
-    console.log("req.body = ", req.body);
-
     let booking = new Booking({
       booking_number: RandomID(12),
       package_id,
@@ -102,7 +100,6 @@ exports.InsertBooking = async (req, res) => {
       phone_number,
       country,
       city,
-      social_media,
       whatsapp,
       facebook,
     });

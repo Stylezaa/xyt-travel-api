@@ -9,6 +9,7 @@ const {
   GetPackageAll,
   GetPackageByID,
   Insert,
+  UpdatePackage,
   DeletePackageById,
 } = require("../controllers/package");
 
@@ -38,12 +39,24 @@ router.post(
     { name: "cover", maxCount: 1 },
     { name: "cover_itinerary", maxCount: 20 },
   ]),
+  auth,
   Insert
+);
+
+//@Endpoint https://localhost:8000/api/package/update/:id
+//@Method   Patch
+//@Access   Private
+router.patch(
+  "/package/update/:id",
+  auth,
+  AdminCheck,
+  upload.single("cover"),
+  UpdatePackage
 );
 
 //@Endpoint https://localhost:8000/api/package/delete/:id
 //@Method   Delete
 //@Access   Private
-router.delete("/package/delete/:id", DeletePackageById);
+router.delete("/package/delete/:id", auth, AdminCheck, DeletePackageById);
 
 module.exports = router;

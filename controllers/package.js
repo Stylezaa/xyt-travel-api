@@ -81,13 +81,8 @@ exports.Insert = async (req, res) => {
       enabled,
     } = req.body;
 
-    console.log("title_pocket = ", title_pocket);
-
     const files1 = req.files["cover"][0];
     const files2 = req.files["cover_itinerary"];
-
-    console.log("files1 = ", files1);
-    console.log("files2 = ", files2);
 
     if (!files1 || files2.length === 0) {
       return res.status(404).send({
@@ -117,9 +112,6 @@ exports.Insert = async (req, res) => {
         meals_pocket: meals_pocket[index],
       });
     }
-
-    console.log("ItineraryArray = ", ItineraryArray);
-    console.log("PocketArray = ", PocketArray);
 
     let package = new Package({
       title,
@@ -190,6 +182,83 @@ exports.Insert = async (req, res) => {
     res.status(201).send({
       message: "Insert Product Successfully",
       status: 201,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: error,
+      status: 500,
+    });
+  }
+};
+
+exports.UpdatePackage = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      title,
+      price,
+      duration_tour,
+      start_tour,
+      end_tour,
+      meals_tour,
+      cities_tour,
+      min_tour,
+      max_tour,
+      trip_overview,
+      recommend_for,
+      booking_policy,
+      enabled,
+    } = req.body;
+
+    const file = req.file;
+
+    // Check ID has found ?
+    const ExistPackage = await Package.findById(id);
+    if (!ExistPackage) {
+      return res.status(404).send({
+        message: "ບໍ່ພົບ Package ນີ້",
+        status: 404,
+      });
+    }
+
+    await Package.updateOne(
+      {
+        _id: id,
+      },
+      {
+        title: title,
+        price: price,
+        duration_tour: duration_tour,
+        start_tour: start_tour,
+        end_tour: end_tour,
+        meals_tour: meals_tour,
+        cities_tour: cities_tour,
+        min_tour: min_tour,
+        max_tour: max_tour,
+        trip_overview: trip_overview,
+        recommend_for: recommend_for,
+        booking_policy: booking_policy,
+        enabled: enabled,
+      }
+    );
+
+    if (file) {
+      let fileFinal = file.filename;
+      await Package.updateOne(
+        {
+          _id: id,
+        },
+        {
+          cover: fileFinal,
+        }
+      );
+    }
+
+    res.status(200).json({
+      message: "ອັບເດດ Package ສໍາເລັດ",
+      status: 200,
     });
   } catch (error) {
     console.log(error);
