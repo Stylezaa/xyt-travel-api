@@ -16,11 +16,11 @@ function RandomID(length) {
 
 exports.GetBookingAll = async (req, res) => {
   try {
-    let booking = await Booking.find()
+    let data = await Booking.find()
       .populate({ path: "package_id" })
       .sort({ createdAt: -1 });
 
-    if (booking.length === 0) {
+    if (data.length === 0) {
       return res.status(404).send({
         message: "Not Found Any Booking",
         status: 404,
@@ -28,7 +28,7 @@ exports.GetBookingAll = async (req, res) => {
     }
 
     res.status(200).send({
-      message: booking,
+      message: data,
       status: 200,
     });
   } catch (error) {

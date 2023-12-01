@@ -4,7 +4,48 @@ exports.GetPackageAll = async (req, res) => {
   try {
     let package = await Package.find()
       .populate({ path: "users_booking" })
+      .populate({ path: "category" })
       .sort({ createdAt: -1 });
+
+    const basePath = `${req.protocol}://${req.get("host")}/uploads/packages/`;
+
+    if (package.length === 0) {
+      return res.status(404).send({
+        message: "Not Found Any Package",
+        status: 404,
+      });
+    }
+
+    res.status(200).send({
+      message: package,
+      url: basePath,
+      status: 200,
+    });
+  } catch (error) {
+    res.status(500).send({
+      message: error,
+      status: 500,
+    });
+  }
+};
+
+exports.GetPackageByCate = async (req, res) => {
+  try {
+    const { category } = req.query;
+    let package = await Package.find()
+      .populate({
+        path: "users_booking",
+      })
+      .populate({
+        path: "category",
+        match: {
+          cate_name: category,
+        },
+      })
+      .sort({ createdAt: -1 })
+      .then((data) => {
+        return data.filter((parent) => parent.category !== null);
+      });
 
     const basePath = `${req.protocol}://${req.get("host")}/uploads/packages/`;
 
@@ -33,6 +74,7 @@ exports.GetPackageByID = async (req, res) => {
     const { title } = req.params;
     let packageOne = await Package.findOne({ title: title })
       .populate("users_booking")
+      .populate({ path: "category" })
       .exec();
     if (!packageOne) {
       return res.status(404).send({
@@ -58,6 +100,7 @@ exports.Insert = async (req, res) => {
       title,
       price,
       duration_tour,
+      category,
       start_tour,
       end_tour,
       meals_tour,
@@ -116,6 +159,7 @@ exports.Insert = async (req, res) => {
     let package = new Package({
       title,
       price,
+      category,
       duration_tour,
       start_tour,
       end_tour,
@@ -146,7 +190,7 @@ exports.Insert = async (req, res) => {
       );
     }
 
-    if (title_itinerary) {
+    if (Array.isArray(title_itinerary)) {
       for (let index = 0; index < title_itinerary.length; index++) {
         await Package.updateOne(
           {
@@ -157,9 +201,25 @@ exports.Insert = async (req, res) => {
           }
         );
       }
+    } else {
+      let itineraryItem = {
+        title_itinerary,
+        accommodations_itinerary,
+        meals_itinerary,
+        must_try_itinerary,
+        content_itinerary,
+      };
+      await Package.updateOne(
+        {
+          _id: package._id,
+        },
+        {
+          itinerary: itineraryItem,
+        }
+      );
     }
 
-    if (title_pocket) {
+    if (Array.isArray(title_pocket)) {
       for (let index = 0; index < title_pocket.length; index++) {
         await Package.updateOne(
           {
@@ -170,6 +230,21 @@ exports.Insert = async (req, res) => {
           }
         );
       }
+    } else {
+      let PocketItem = {
+        title_pocket,
+        activities_pocket,
+        where_to_stay_pocket,
+        meals_pocket,
+      };
+      await Package.updateOne(
+        {
+          _id: package._id,
+        },
+        {
+          pocket_summary: PocketItem,
+        }
+      );
     }
 
     if (!package) {
@@ -199,6 +274,7 @@ exports.UpdatePackage = async (req, res, next) => {
     const {
       title,
       price,
+      category,
       duration_tour,
       start_tour,
       end_tour,
@@ -230,6 +306,7 @@ exports.UpdatePackage = async (req, res, next) => {
       {
         title: title,
         price: price,
+        category: category,
         duration_tour: duration_tour,
         start_tour: start_tour,
         end_tour: end_tour,

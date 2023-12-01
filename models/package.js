@@ -15,6 +15,11 @@ const PackageSchema = new Schema(
       type: Number,
       require: true,
     },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "category",
+      require: true,
+    },
     // TOUR
     duration_tour: {
       type: Number,

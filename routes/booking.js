@@ -40,11 +40,6 @@ router.delete("/booking/delete/:id", auth, DeleteBookingById);
 //@Endpoint https://localhost:8000/api/booking/change-status/:id
 //@Method   POST
 //@Access   Private
-router.post(
-  "/booking/change-status/:id",
-  auth,
-  AdminCheck,
-  ChangeStatusBooking
-);
+router.post("/booking/change-status/:id", auth, ChangeStatusBooking);
 
 module.exports = router;

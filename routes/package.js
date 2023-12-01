@@ -7,6 +7,7 @@ const upload = require("../functions/PackageUploadConfig");
 //Controllers
 const {
   GetPackageAll,
+  GetPackageByCate,
   GetPackageByID,
   Insert,
   UpdatePackage,
@@ -24,6 +25,11 @@ const { auth, AdminCheck } = require("../middleware/AuthCheck"); // Must has tok
 //@Method   GET
 //@Access   Publish
 router.get("/package/getall", GetPackageAll);
+
+//@Endpoint https://localhost:8000/api/package/getall
+//@Method   GET
+//@Access   Publish
+router.get("/package/getall/category", GetPackageByCate);
 
 //@Endpoint https://localhost:8000/api/package/get/:id
 //@Method   POST
