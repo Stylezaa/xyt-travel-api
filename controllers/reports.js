@@ -78,6 +78,9 @@ exports.GetAllBookingByCreatedAt = async (req, res) => {
           },
         },
       },
+      {
+        $sort: { timestamp: -1 },
+      },
     ]);
 
     res.status(200).send({
