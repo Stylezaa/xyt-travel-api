@@ -2,7 +2,10 @@
 const express = require("express");
 const router = express.Router();
 // Controllers
-const { GetReportAdmin } = require("../controllers/reports");
+const {
+  GetReportAdmin,
+  GetAllBookingByCreatedAt,
+} = require("../controllers/reports");
 // Middleware
 const { auth } = require("../middleware/AuthCheck");
 
@@ -10,5 +13,10 @@ const { auth } = require("../middleware/AuthCheck");
 //@Method   GET
 //@Access   Private
 router.get("/report/gets/admin", auth, GetReportAdmin);
+
+//@Endpoint https://localhost:8000/api/report/daybycreated
+//@Method   GET
+//@Access   Private
+router.get("/report/daybycreated", auth, GetAllBookingByCreatedAt);
 
 module.exports = router;

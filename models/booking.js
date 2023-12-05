@@ -42,11 +42,16 @@ const BookingSchema = new Schema(
       type: String,
       require: true,
     },
-    gender: {
+    // Pass spot
+    name_passport: {
       type: String,
       require: true,
     },
-    full_name: {
+    date_of_birth_passport: {
+      type: String,
+      require: true,
+    },
+    gender: {
       type: String,
       require: true,
     },

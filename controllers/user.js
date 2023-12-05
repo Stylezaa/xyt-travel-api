@@ -128,7 +128,7 @@ exports.UpdateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const { email, f_name, l_name, phone } = req.body;
+    const { email, f_name, l_name, phone_number } = req.body;
 
     const file = req.file;
 
@@ -149,7 +149,7 @@ exports.UpdateUser = async (req, res, next) => {
         email: email,
         f_name: f_name,
         l_name: l_name,
-        phone: phone,
+        phone_number: phone_number,
       }
     );
 

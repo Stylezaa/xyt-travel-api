@@ -33,10 +33,6 @@ const PackageSchema = new Schema(
       type: String,
       require: true,
     },
-    meals_tour: {
-      type: String,
-      require: true,
-    },
     cities_tour: {
       type: Number,
       require: true,
