@@ -1,6 +1,8 @@
 // Model
 const Booking = require("../models/booking");
 const Package = require("../models/package");
+// Functions
+const sendEmail = require("../functions/MailSender");
 // Function Random Name Order
 function RandomID(length) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -45,6 +47,7 @@ exports.GetBookingByID = async (req, res) => {
     let bookingOne = await Booking.findOne({ _id: id })
       .populate("package_id")
       .exec();
+
     if (!bookingOne) {
       return res.status(404).send({
         message: "Not Found This Booking",
@@ -108,6 +111,13 @@ exports.InsertBooking = async (req, res) => {
     });
 
     await booking.save(); // Save to database
+
+    await sendEmail({
+      from: "Xayong-Tour Official",
+      email: email,
+      subject: "Are you Booking?",
+      message: "Please Send Slip Payment to Xayong-Tour Contact",
+    });
 
     if (booking) {
       await Package.updateOne(
@@ -179,7 +189,7 @@ exports.ChangeStatusBooking = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const { status } = req.body;
+    const { status, email } = req.body;
 
     // Check ID has found ?
     const ExistBooking = await Booking.findById(id);
@@ -198,6 +208,13 @@ exports.ChangeStatusBooking = async (req, res, next) => {
         status: status,
       }
     );
+
+    await sendEmail({
+      from: "Xayong-Tour Official",
+      email: email,
+      subject: "Booking Are Successfully",
+      message: `Your can download Invoice from this ${`https://xayong.netlify.app/print/invoice/${id}`}`,
+    });
 
     res.status(200).json({
       message: "ບັນທຶກສະຖານະສໍາເລັດ",

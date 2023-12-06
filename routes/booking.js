@@ -24,8 +24,8 @@ router.get("/booking/getall", auth, GetBookingAll);
 
 //@Endpoint https://localhost:8000/api/booking/get/:id
 //@Method   POST
-//@Access   Private
-router.post("/booking/get/:id", auth, GetBookingByID);
+//@Access   Publish
+router.get("/booking/get/:id", GetBookingByID);
 
 //@Endpoint https://localhost:8000/api/booking/insert
 //@Method   POST
