@@ -201,11 +201,12 @@ exports.Insert = async (req, res) => {
       }
     } else {
       let itineraryItem = {
-        title_itinerary,
-        accommodations_itinerary,
-        meals_itinerary,
-        must_try_itinerary,
-        content_itinerary,
+        title_itinerary: title_itinerary,
+        accommodations_itinerary: accommodations_itinerary,
+        meals_itinerary: meals_itinerary,
+        must_try_itinerary: must_try_itinerary,
+        content_itinerary: content_itinerary,
+        cover_itinerary: files2[0].filename,
       };
       await Package.updateOne(
         {

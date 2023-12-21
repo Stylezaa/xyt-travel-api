@@ -16,8 +16,6 @@ exports.ContactUs = async (req, res) => {
       specific_request,
     } = req.body;
 
-    console.log(req.body);
-
     const ServerEmail = "anyting9977@gmail.com";
 
     res.status(200).json({
@@ -42,13 +40,6 @@ exports.ContactUs = async (req, res) => {
              Specific Request: ${specific_request}
       `,
     });
-    // .then(() => {
-    //   res.status(200).json({
-    //     message: "Send Contact Successfully",
-    //     status: 200,
-    //   });
-    // })
-    // .catch((error) => console.log(error));
   } catch (error) {
     console.log(error);
     res.status(500).send({
