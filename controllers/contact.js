@@ -26,7 +26,7 @@ exports.ContactUs = async (req, res) => {
     await sendEmail({
       from: email,
       email: ServerEmail,
-      subject: "Booking Are Successfully",
+      subject: "Contact US",
       message: `
              Form: ${email},
              Full Name: ${full_name},
