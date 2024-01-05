@@ -126,6 +126,10 @@ exports.Insert = async (req, res) => {
     const files1 = req.files["cover"][0];
     const files2 = req.files["cover_itinerary"];
 
+    console.log("Body = ", req.body);
+    console.log("File1 = ", files1);
+    console.log("File2 = ", files2);
+
     if (!files1 || files2.length === 0) {
       return res.status(404).send({
         message: "ໄຟຮຮູບພາບບໍ່ຄົບຖ້ວນ",
@@ -166,7 +170,6 @@ exports.Insert = async (req, res) => {
       min_tour,
       max_tour,
       trip_overview,
-      recommend_for,
       booking_policy,
       enabled,
     });
@@ -175,6 +178,15 @@ exports.Insert = async (req, res) => {
 
     if (enabled) {
       package.enabled = req.body.enabled;
+    }
+
+    if (recommend_for) {
+      await Package.updateOne(
+        {
+          _id: package._id,
+        },
+        { $push: { recommend_for: recommend_for } }
+      );
     }
 
     if (files1) {
@@ -273,8 +285,8 @@ exports.UpdatePackage = async (req, res, next) => {
     const {
       title,
       price,
-      category,
       duration_tour,
+      category,
       start_tour,
       end_tour,
       cities_tour,
@@ -282,11 +294,27 @@ exports.UpdatePackage = async (req, res, next) => {
       max_tour,
       trip_overview,
       recommend_for,
+      // itinerary
+      title_itinerary,
+      accommodations_itinerary,
+      meals_itinerary,
+      must_try_itinerary,
+      content_itinerary,
+      // pocket_summary
+      title_pocket,
+      activities_pocket,
+      where_to_stay_pocket,
+      meals_pocket,
       booking_policy,
       enabled,
     } = req.body;
 
-    const file = req.file;
+    const files1 = (req.files["cover"] && req.files["cover"][0]) || null;
+    const files2 = req.files["cover_itinerary"] || null;
+
+    console.log("Body = ", req.body);
+    console.log("File1 = ", files1);
+    console.log("File2 = ", files2);
 
     // Check ID has found ?
     const ExistPackage = await Package.findById(id);
@@ -302,30 +330,117 @@ exports.UpdatePackage = async (req, res, next) => {
         _id: id,
       },
       {
-        title: title,
-        price: price,
-        category: category,
-        duration_tour: duration_tour,
-        start_tour: start_tour,
-        end_tour: end_tour,
-        cities_tour: cities_tour,
-        min_tour: min_tour,
-        max_tour: max_tour,
-        trip_overview: trip_overview,
-        recommend_for: recommend_for,
-        booking_policy: booking_policy,
-        enabled: enabled,
+        title,
+        price,
+        category,
+        duration_tour,
+        start_tour,
+        end_tour,
+        cities_tour,
+        min_tour,
+        max_tour,
+        trip_overview,
+        booking_policy,
+        enabled,
       }
     );
 
-    if (file) {
-      let fileFinal = file.filename;
+    if (files1) {
       await Package.updateOne(
         {
           _id: id,
         },
         {
-          cover: fileFinal,
+          cover: files1.filename,
+        }
+      );
+    }
+
+    if (recommend_for) {
+      await Package.updateOne(
+        {
+          _id: id,
+        },
+        { $push: { recommend_for: recommend_for } }
+      );
+    }
+
+    // Itinerary
+    let ItineraryArray = [];
+    for (let index = 0; index < title_itinerary.length; index++) {
+      ItineraryArray.push({
+        title_itinerary: title_itinerary[index],
+        accommodations_itinerary: accommodations_itinerary[index],
+        meals_itinerary: meals_itinerary[index],
+        must_try_itinerary: must_try_itinerary[index],
+        content_itinerary: content_itinerary[index],
+      });
+    }
+
+    if (Array.isArray(title_itinerary)) {
+      for (let index = 0; index < title_itinerary.length; index++) {
+        await Package.updateOne(
+          {
+            _id: id,
+          },
+          {
+            itinerary: ItineraryArray,
+          }
+        );
+      }
+    } else {
+      let itineraryItem = {
+        title_itinerary: title_itinerary,
+        accommodations_itinerary: accommodations_itinerary,
+        meals_itinerary: meals_itinerary,
+        must_try_itinerary: must_try_itinerary,
+        content_itinerary: content_itinerary,
+      };
+      await Package.updateOne(
+        {
+          _id: id,
+        },
+        {
+          itinerary: itineraryItem,
+        }
+      );
+    }
+
+    // Pocket
+    let PocketArray = [];
+    for (let index = 0; index < title_pocket.length; index++) {
+      PocketArray.push({
+        title_pocket: title_pocket[index],
+        activities_pocket: activities_pocket[index],
+        where_to_stay_pocket: where_to_stay_pocket[index],
+        meals_pocket: meals_pocket[index],
+      });
+    }
+
+    if (Array.isArray(title_pocket)) {
+      for (let index = 0; index < title_pocket.length; index++) {
+        await Package.updateOne(
+          {
+            _id: id,
+          },
+          {
+            pocket_summary: PocketArray,
+          }
+        );
+      }
+    } else {
+      let PocketItem = {
+        title_pocket,
+        activities_pocket,
+        where_to_stay_pocket,
+        meals_pocket,
+      };
+      await Package.updateOne(
+        {
+          _id: id,
+        },
+        {
+          pocket_summary: PocketItem,
         }
       );
     }

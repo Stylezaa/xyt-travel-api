@@ -56,7 +56,10 @@ router.patch(
   "/package/update/:id",
   auth,
   AdminCheck,
-  upload.single("cover"),
+  upload.fields([
+    { name: "cover", maxCount: 1 },
+    { name: "cover_itinerary", maxCount: 20 },
+  ]),
   UpdatePackage
 );
 
