@@ -213,7 +213,7 @@ exports.ChangeStatusBooking = async (req, res, next) => {
       from: "Xayong-Tour Official",
       email: email,
       subject: "Booking Are Successfully",
-      message: `Your can download Invoice from this ${`https://xayong.netlify.app/print/invoice/${id}`}`,
+      message: `Your can download Invoice from this ${`https://xayongtour.com/print/invoice/${id}`}`,
     });
 
     res.status(200).json({
