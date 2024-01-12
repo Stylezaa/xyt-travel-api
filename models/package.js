@@ -22,7 +22,7 @@ const PackageSchema = new Schema(
     },
     // TOUR
     duration_tour: {
-      type: Number,
+      type: String,
       require: true,
     },
     start_tour: {
@@ -34,7 +34,7 @@ const PackageSchema = new Schema(
       require: true,
     },
     cities_tour: {
-      type: Number,
+      type: String,
       require: true,
     },
     min_tour: {

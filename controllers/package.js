@@ -110,9 +110,6 @@ exports.Insert = async (req, res) => {
       recommend_for,
       // itinerary
       title_itinerary,
-      accommodations_itinerary,
-      meals_itinerary,
-      must_try_itinerary,
       content_itinerary,
       // pocket_summary
       title_pocket,
@@ -142,9 +139,6 @@ exports.Insert = async (req, res) => {
       ItineraryArray.push({
         title_itinerary: title_itinerary[index],
         cover_itinerary: files2[index].filename,
-        accommodations_itinerary: accommodations_itinerary[index],
-        meals_itinerary: meals_itinerary[index],
-        must_try_itinerary: must_try_itinerary[index],
         content_itinerary: content_itinerary[index],
       });
     }
@@ -214,9 +208,6 @@ exports.Insert = async (req, res) => {
     } else {
       let itineraryItem = {
         title_itinerary: title_itinerary,
-        accommodations_itinerary: accommodations_itinerary,
-        meals_itinerary: meals_itinerary,
-        must_try_itinerary: must_try_itinerary,
         content_itinerary: content_itinerary,
         cover_itinerary: files2[0].filename,
       };
@@ -296,9 +287,6 @@ exports.UpdatePackage = async (req, res, next) => {
       recommend_for,
       // itinerary
       title_itinerary,
-      accommodations_itinerary,
-      meals_itinerary,
-      must_try_itinerary,
       content_itinerary,
       // pocket_summary
       title_pocket,
@@ -370,9 +358,6 @@ exports.UpdatePackage = async (req, res, next) => {
     for (let index = 0; index < title_itinerary.length; index++) {
       ItineraryArray.push({
         title_itinerary: title_itinerary[index],
-        accommodations_itinerary: accommodations_itinerary[index],
-        meals_itinerary: meals_itinerary[index],
-        must_try_itinerary: must_try_itinerary[index],
         content_itinerary: content_itinerary[index],
       });
     }
@@ -391,9 +376,6 @@ exports.UpdatePackage = async (req, res, next) => {
     } else {
       let itineraryItem = {
         title_itinerary: title_itinerary,
-        accommodations_itinerary: accommodations_itinerary,
-        meals_itinerary: meals_itinerary,
-        must_try_itinerary: must_try_itinerary,
         content_itinerary: content_itinerary,
       };
       await Package.updateOne(
