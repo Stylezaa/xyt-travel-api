@@ -79,6 +79,10 @@ const BookingSchema = new Schema(
       type: String,
       require: true,
     },
+    totalPrice: {
+      type: Number,
+      require: true,
+    },
     status: {
       type: String,
       require: true,

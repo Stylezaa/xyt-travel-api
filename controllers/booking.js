@@ -87,6 +87,7 @@ exports.InsertBooking = async (req, res) => {
       city,
       whatsapp,
       facebook,
+      totalPrice,
     } = req.body;
 
     let booking = new Booking({
@@ -108,6 +109,7 @@ exports.InsertBooking = async (req, res) => {
       city,
       whatsapp,
       facebook,
+      totalPrice,
     });
 
     await booking.save(); // Save to database

@@ -300,8 +300,8 @@ exports.UpdatePackage = async (req, res, next) => {
     const files1 = (req.files["cover"] && req.files["cover"][0]) || null;
     const files2 = req.files["cover_itinerary"] || null;
 
-    console.log("Body = ", req.body);
-    console.log("File1 = ", files1);
+    // console.log("Body = ", req.body);
+    // console.log("File1 = ", files1);
     console.log("File2 = ", files2);
 
     // Check ID has found ?
@@ -353,14 +353,66 @@ exports.UpdatePackage = async (req, res, next) => {
       );
     }
 
-    // Itinerary
-    let ItineraryArray = [];
-    for (let index = 0; index < title_itinerary.length; index++) {
-      ItineraryArray.push({
-        title_itinerary: title_itinerary[index],
-        content_itinerary: content_itinerary[index],
-      });
+    let oldArray = ExistPackage.itinerary;
+    let newArray = [];
+    if (files2?.length > 0) {
+      for (let index = 0; index < title_itinerary.length; index++) {
+        if (files2[index]?.filename) {
+          console.log("files2[index]?.filename = ", files2[index]?.filename);
+          newArray.push({
+            title_itinerary: title_itinerary[index],
+            cover_itinerary: files2[index]?.filename,
+            content_itinerary: content_itinerary[index],
+          });
+        } else {
+          newArray.push({
+            title_itinerary: title_itinerary[index],
+            cover_itinerary: oldArray[index].cover_itinerary,
+            content_itinerary: content_itinerary[index],
+          });
+        }
+      }
+    } else {
+      for (let index = 0; index < title_itinerary.length; index++) {
+        newArray.push({
+          title_itinerary: title_itinerary[index],
+          cover_itinerary: oldArray[index].cover_itinerary,
+          content_itinerary: content_itinerary[index],
+        });
+      }
     }
+
+    console.log("oldArray = ", oldArray);
+    console.log("newArray = ", newArray);
+
+    for (let i = 0; i < Math.min(oldArray.length, newArray.length); i++) {
+      for (const key in newArray[i]) {
+        if (
+          key !== "cover_itinerary" &&
+          oldArray[i][key] !== newArray[i][key]
+        ) {
+          oldArray[i][key] = newArray[i][key];
+        } else if (
+          key === "cover_itinerary" &&
+          oldArray[i][key] !== newArray[i][key]
+        ) {
+          // If you specifically want to update cover_itinerary field
+          oldArray[i][key] = newArray[i][key];
+        }
+      }
+    }
+
+    console.log("oldArray2 = ", oldArray);
+
+    // // Itinerary
+    // let ItineraryArray = [];
+    // for (let index = 0; index < title_itinerary.length; index++) {
+    //   ItineraryArray.push({
+    //     title_itinerary: title_itinerary[index],
+    //     cover_itinerary: files2[index].filename,
+    //     content_itinerary: content_itinerary[index],
+    //   });
+    // }
 
     if (Array.isArray(title_itinerary)) {
       for (let index = 0; index < title_itinerary.length; index++) {
@@ -369,15 +421,16 @@ exports.UpdatePackage = async (req, res, next) => {
             _id: id,
           },
           {
-            itinerary: ItineraryArray,
+            itinerary: oldArray,
           }
         );
       }
     } else {
       let itineraryItem = {
-        title_itinerary: title_itinerary,
-        content_itinerary: content_itinerary,
+        title_itinerary: oldArray?.title_itinerary,
+        content_itinerary: oldArray?.content_itinerary,
       };
+      console.log("itineraryItem = ", itineraryItem);
       await Package.updateOne(
         {
           _id: id,
