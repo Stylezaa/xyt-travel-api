@@ -286,8 +286,9 @@ exports.UpdatePackage = async (req, res, next) => {
       trip_overview,
       recommend_for,
       // itinerary
-      title_itinerary,
-      content_itinerary,
+      // title_itinerary,
+      // content_itinerary,
+      // cover_itinerary_index,
       // pocket_summary
       title_pocket,
       activities_pocket,
@@ -298,11 +299,7 @@ exports.UpdatePackage = async (req, res, next) => {
     } = req.body;
 
     const files1 = (req.files["cover"] && req.files["cover"][0]) || null;
-    const files2 = req.files["cover_itinerary"] || null;
-
-    // console.log("Body = ", req.body);
-    // console.log("File1 = ", files1);
-    console.log("File2 = ", files2);
+    // const files2 = req.files["cover_itinerary"] || null;
 
     // Check ID has found ?
     const ExistPackage = await Package.findById(id);
@@ -353,93 +350,58 @@ exports.UpdatePackage = async (req, res, next) => {
       );
     }
 
-    let oldArray = ExistPackage.itinerary;
-    let newArray = [];
-    if (files2?.length > 0) {
-      for (let index = 0; index < title_itinerary.length; index++) {
-        if (files2[index]?.filename) {
-          console.log("files2[index]?.filename = ", files2[index]?.filename);
-          newArray.push({
-            title_itinerary: title_itinerary[index],
-            cover_itinerary: files2[index]?.filename,
-            content_itinerary: content_itinerary[index],
-          });
-        } else {
-          newArray.push({
-            title_itinerary: title_itinerary[index],
-            cover_itinerary: oldArray[index].cover_itinerary,
-            content_itinerary: content_itinerary[index],
-          });
-        }
-      }
-    } else {
-      for (let index = 0; index < title_itinerary.length; index++) {
-        newArray.push({
-          title_itinerary: title_itinerary[index],
-          cover_itinerary: oldArray[index].cover_itinerary,
-          content_itinerary: content_itinerary[index],
-        });
-      }
-    }
-
-    console.log("oldArray = ", oldArray);
-    console.log("newArray = ", newArray);
-
-    for (let i = 0; i < Math.min(oldArray.length, newArray.length); i++) {
-      for (const key in newArray[i]) {
-        if (
-          key !== "cover_itinerary" &&
-          oldArray[i][key] !== newArray[i][key]
-        ) {
-          oldArray[i][key] = newArray[i][key];
-        } else if (
-          key === "cover_itinerary" &&
-          oldArray[i][key] !== newArray[i][key]
-        ) {
-          // If you specifically want to update cover_itinerary field
-          oldArray[i][key] = newArray[i][key];
-        }
-      }
-    }
-
-    console.log("oldArray2 = ", oldArray);
-
+    // let oldItinerary = ExistPackage.itinerary;
     // // Itinerary
     // let ItineraryArray = [];
     // for (let index = 0; index < title_itinerary.length; index++) {
+    //   if (cover_itinerary_index.length > 0) {
+    //     for (
+    //       let CoverIndex = 0;
+    //       CoverIndex < cover_itinerary_index.length;
+    //       CoverIndex++
+    //     ) {
+    //       if (files2 && parseInt(cover_itinerary_index[CoverIndex]) === index) {
+    //         ItineraryArray.push({
+    //           title_itinerary: title_itinerary[index],
+    //           cover_itinerary: files2[index]?.filename,
+    //           content_itinerary: content_itinerary[index],
+    //         });
+    //       }
+    //     }
+    //   }
     //   ItineraryArray.push({
     //     title_itinerary: title_itinerary[index],
-    //     cover_itinerary: files2[index].filename,
+    //     cover_itinerary: oldItinerary[index].cover_itinerary,
     //     content_itinerary: content_itinerary[index],
     //   });
     // }
 
-    if (Array.isArray(title_itinerary)) {
-      for (let index = 0; index < title_itinerary.length; index++) {
-        await Package.updateOne(
-          {
-            _id: id,
-          },
-          {
-            itinerary: oldArray,
-          }
-        );
-      }
-    } else {
-      let itineraryItem = {
-        title_itinerary: oldArray?.title_itinerary,
-        content_itinerary: oldArray?.content_itinerary,
-      };
-      console.log("itineraryItem = ", itineraryItem);
-      await Package.updateOne(
-        {
-          _id: id,
-        },
-        {
-          itinerary: itineraryItem,
-        }
-      );
-    }
+    // if (Array.isArray(title_itinerary)) {
+    //   for (let index = 0; index < title_itinerary.length; index++) {
+    //     await Package.updateOne(
+    //       {
+    //         _id: id,
+    //       },
+    //       {
+    //         itinerary: ItineraryArray,
+    //       }
+    //     );
+    //   }
+    // } else {
+    //   let itineraryItem = {
+    //     title_itinerary: title_itinerary,
+    //     content_itinerary: content_itinerary,
+    //   };
+    //   console.log("itineraryItem = ", itineraryItem);
+    //   await Package.updateOne(
+    //     {
+    //       _id: id,
+    //     },
+    //     {
+    //       itinerary: itineraryItem,
+    //     }
+    //   );
+    // }
 
     // Pocket
     let PocketArray = [];
