@@ -62,7 +62,6 @@ exports.Insert = async (req, res) => {
     const { enabled } = req.body;
 
     const files = req.files["images"];
-    console.log(files);
     if (!files) {
       return res.status(404).send({
         message: "Not Found Images",

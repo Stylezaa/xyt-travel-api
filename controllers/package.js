@@ -285,22 +285,25 @@ exports.UpdatePackage = async (req, res, next) => {
       max_tour,
       trip_overview,
       recommend_for,
+
       // itinerary
-      title_itinerary,
-      content_itinerary,
-      cover_itinerary,
-      cover_itinerary_index,
+      // title_itinerary,
+      // content_itinerary,
+      // cover_itinerary,
+      // cover_itinerary_index,
+
       // pocket_summary
       title_pocket,
       activities_pocket,
       where_to_stay_pocket,
       meals_pocket,
+
       booking_policy,
       enabled,
     } = req.body;
 
     const files1 = (req.files["cover"] && req.files["cover"][0]) || null;
-    const files2 = req.files["cover_itinerary"] || null;
+    // const files2 = req.files["cover_itinerary"] || null;
 
     // Check ID has found ?
     const ExistPackage = await Package.findById(id);
@@ -351,41 +354,41 @@ exports.UpdatePackage = async (req, res, next) => {
       );
     }
 
-    // console.log("cover_itinerary_index = ", cover_itinerary_index);
-    console.log("files2 = ", files2);
+    // // console.log("cover_itinerary_index = ", cover_itinerary_index);
+    // console.log("files2 = ", files2);
 
-    console.log("cover_itinerary = ", cover_itinerary);
+    // console.log("cover_itinerary = ", cover_itinerary);
 
-    // Itinerary;
-    let ItineraryArray = [];
-    for (let index = 0; index < title_itinerary.length; index++) {
-      console.log("cover_itinerary[index] = ", cover_itinerary[index]);
-      ItineraryArray.push({
-        title_itinerary: title_itinerary[index],
-        cover_itinerary:
-          parseInt(cover_itinerary_index) === index
-            ? ""
-            : cover_itinerary[index] || "",
-        content_itinerary: content_itinerary[index],
-      });
-    }
+    // // Itinerary;
+    // let ItineraryArray = [];
+    // for (let index = 0; index < title_itinerary.length; index++) {
+    //   console.log("cover_itinerary[index] = ", cover_itinerary[index]);
+    //   ItineraryArray.push({
+    //     title_itinerary: title_itinerary[index],
+    //     cover_itinerary:
+    //       parseInt(cover_itinerary_index) === index
+    //         ? ""
+    //         : cover_itinerary[index] || "",
+    //     content_itinerary: content_itinerary[index],
+    //   });
+    // }
 
-    console.log("ItineraryArrayStart = ", ItineraryArray);
+    // console.log("ItineraryArrayStart = ", ItineraryArray);
 
-    if (cover_itinerary_index?.length > 0) {
-      for (let index = 0; index < cover_itinerary_index.length; index++) {
-        const itineraryIndex = parseInt(cover_itinerary_index[index]);
-        if (itineraryIndex < ItineraryArray.length) {
-          const file =
-            req.files["cover_itinerary"] && req.files["cover_itinerary"][index];
-          if (file) {
-            ItineraryArray[itineraryIndex].cover_itinerary = file.filename;
-          }
-        }
-      }
-    }
+    // if (cover_itinerary_index?.length > 0) {
+    //   for (let index = 0; index < cover_itinerary_index.length; index++) {
+    //     const itineraryIndex = parseInt(cover_itinerary_index[index]);
+    //     if (itineraryIndex < ItineraryArray.length) {
+    //       const file =
+    //         req.files["cover_itinerary"] && req.files["cover_itinerary"][index];
+    //       if (file) {
+    //         ItineraryArray[itineraryIndex].cover_itinerary = file.filename;
+    //       }
+    //     }
+    //   }
+    // }
 
-    console.log("ItineraryArrayFinal = ", ItineraryArray);
+    // console.log("ItineraryArrayFinal = ", ItineraryArray);
 
     // if (Array.isArray(title_itinerary)) {
     //   for (let index = 0; index < title_itinerary.length; index++) {
