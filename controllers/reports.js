@@ -14,12 +14,11 @@ exports.GetReportAdmin = async (req, res) => {
     let TotalPackages = await Package.find();
     let TotalBooking = await Booking.find();
     let TotalIncome = await Booking.find({ status: status.Paymented })
-      .populate({ path: "package_id" })
       .then((result) => {
         let price = 0;
         for (let index = 0; index < result.length; index++) {
-          if (result[index].package_id) {
-            price = price + result[index].package_id?.price;
+          if (result[index]?.totalPrice > 0) {
+            price = price + result[index]?.totalPrice;
           }
         }
         return price;
