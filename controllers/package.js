@@ -350,36 +350,11 @@ exports.UpdatePackage = async (req, res, next) => {
       );
     }
 
-    // console.log({ cover_itinerary_index });
-
-    // let OldItinerary = ExistPackage.itinerary;
-    // console.log("Start = ", OldItinerary);
-    // if (typeof cover_itinerary_index === "string") {
-    //   if (OldItinerary[parseInt(cover_itinerary_index)]) {
-    //     OldItinerary[parseInt(cover_itinerary_index)].cover_itinerary =
-    //       files2[0]?.filename;
-    //   }
-    // } else if (typeof cover_itinerary_index === "object") {
-    //   for (let index = 0; index < cover_itinerary_index.length; index++) {
-    //     OldItinerary[parseInt(cover_itinerary_index[index])].cover_itinerary =
-    //       files2[index]?.filename;
-    //   }
-    // }
-
-    // // console.log({ title_itinerary });
-
-    // for (let index = 0; index < title_itinerary.length; index++) {
-    //   if (OldItinerary[index]) {
-    //     OldItinerary[index].title_itinerary = title_itinerary[index];
-    //     OldItinerary[index].content_itinerary = content_itinerary[index];
-    //   }
-    // }
-
     // console.log("end = ", OldItinerary);
     console.log({ oldData: cover_itinerary });
     // console.log({ file2: files2[0]?.filename });
 
-    // console.log({ files2 });
+    console.log({ files2 });
 
     let ItineraryArray = [];
 
@@ -399,6 +374,15 @@ exports.UpdatePackage = async (req, res, next) => {
             content_itinerary: content_itinerary[index],
           });
         }
+
+        await Package.updateOne(
+          {
+            _id: id,
+          },
+          {
+            itinerary: ItineraryArray,
+          }
+        );
       }
       // else if (typeof cover_itinerary === "string") {
       //   let OldItinerary = ExistPackage.itinerary;
@@ -418,7 +402,7 @@ exports.UpdatePackage = async (req, res, next) => {
       //     }
       //   }
       // }
-    } else if (files2?.length === 0) {
+    } else if (!files2) {
       for (let index = 0; index < title_itinerary.length; index++) {
         ItineraryArray.push({
           title_itinerary: title_itinerary[index],
@@ -426,35 +410,13 @@ exports.UpdatePackage = async (req, res, next) => {
           content_itinerary: content_itinerary[index],
         });
       }
-    }
 
-    console.log("Final Data = ", ItineraryArray);
-
-    // console.log({ newData: cover_itinerary });
-
-    if (Array.isArray(title_itinerary)) {
-      for (let index = 0; index < title_itinerary.length; index++) {
-        await Package.updateOne(
-          {
-            _id: id,
-          },
-          {
-            itinerary: ItineraryArray,
-          }
-        );
-      }
-    } else {
-      let itineraryItem = {
-        title_itinerary: title_itinerary,
-        cover_itinerary: cover_itinerary,
-        content_itinerary: content_itinerary,
-      };
       await Package.updateOne(
         {
           _id: id,
         },
         {
-          itinerary: itineraryItem,
+          itinerary: ItineraryArray,
         }
       );
     }
