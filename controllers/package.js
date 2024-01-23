@@ -350,68 +350,114 @@ exports.UpdatePackage = async (req, res, next) => {
       );
     }
 
-    console.log("cover_itinerary_index = ", cover_itinerary_index);
-    // console.log("files2 = ", files2);
+    // console.log({ cover_itinerary_index });
 
-    // console.log("cover_itinerary = ", cover_itinerary);
+    // let OldItinerary = ExistPackage.itinerary;
+    // console.log("Start = ", OldItinerary);
+    // if (typeof cover_itinerary_index === "string") {
+    //   if (OldItinerary[parseInt(cover_itinerary_index)]) {
+    //     OldItinerary[parseInt(cover_itinerary_index)].cover_itinerary =
+    //       files2[0]?.filename;
+    //   }
+    // } else if (typeof cover_itinerary_index === "object") {
+    //   for (let index = 0; index < cover_itinerary_index.length; index++) {
+    //     OldItinerary[parseInt(cover_itinerary_index[index])].cover_itinerary =
+    //       files2[index]?.filename;
+    //   }
+    // }
 
-    // Itinerary;
+    // // console.log({ title_itinerary });
+
+    // for (let index = 0; index < title_itinerary.length; index++) {
+    //   if (OldItinerary[index]) {
+    //     OldItinerary[index].title_itinerary = title_itinerary[index];
+    //     OldItinerary[index].content_itinerary = content_itinerary[index];
+    //   }
+    // }
+
+    // console.log("end = ", OldItinerary);
+    console.log({ oldData: cover_itinerary });
+    // console.log({ file2: files2[0]?.filename });
+
+    // console.log({ files2 });
+
     let ItineraryArray = [];
-    for (let index = 0; index < title_itinerary.length; index++) {
-      console.log("cover_itinerary[index] = ", cover_itinerary[index]);
-      ItineraryArray.push({
-        title_itinerary: title_itinerary[index],
-        cover_itinerary:
-          parseInt(cover_itinerary_index) === index
-            ? ""
-            : cover_itinerary[index] || "",
-        content_itinerary: content_itinerary[index],
-      });
-    }
 
-    console.log("ItineraryArrayStart = ", ItineraryArray);
-
-    if (cover_itinerary_index?.length > 0) {
-      for (let index = 0; index < cover_itinerary_index.length; index++) {
-        const itineraryIndex = parseInt(cover_itinerary_index[index]);
-        if (itineraryIndex < ItineraryArray.length) {
-          const file =
-            req.files["cover_itinerary"] && req.files["cover_itinerary"][index];
-          if (file) {
-            ItineraryArray[itineraryIndex].cover_itinerary = file.filename;
-          }
+    if (files2?.length > 0) {
+      if (typeof cover_itinerary === "object") {
+        for (let index = 0; index < files2?.length; index++) {
+          cover_itinerary.splice(
+            parseInt(cover_itinerary_index[index]),
+            0,
+            files2[index]?.filename
+          );
         }
+        for (let index = 0; index < title_itinerary.length; index++) {
+          ItineraryArray.push({
+            title_itinerary: title_itinerary[index],
+            cover_itinerary: cover_itinerary[index],
+            content_itinerary: content_itinerary[index],
+          });
+        }
+      }
+      // else if (typeof cover_itinerary === "string") {
+      //   let OldItinerary = ExistPackage.itinerary;
+      //   if (title_itinerary) {
+      //     for (let index = 0; index < title_itinerary?.length; index++) {
+      //       if (OldItinerary[index]) {
+      //         OldItinerary[index].title_itinerary = title_itinerary[index];
+      //         OldItinerary[index].content_itinerary = content_itinerary[index];
+      //       }
+      //     }
+      //   }
+      //   for (let index = 0; index < files2?.length; index++) {
+      //     if (OldItinerary[parseInt(cover_itinerary_index[index])]) {
+      //       OldItinerary[
+      //         parseInt(cover_itinerary_index[index])
+      //       ].cover_itinerary = files2[index]?.filename;
+      //     }
+      //   }
+      // }
+    } else if (files2?.length === 0) {
+      for (let index = 0; index < title_itinerary.length; index++) {
+        ItineraryArray.push({
+          title_itinerary: title_itinerary[index],
+          cover_itinerary: cover_itinerary[index],
+          content_itinerary: content_itinerary[index],
+        });
       }
     }
 
-    console.log("ItineraryArrayFinal = ", ItineraryArray);
+    console.log("Final Data = ", ItineraryArray);
 
-    // if (Array.isArray(title_itinerary)) {
-    //   for (let index = 0; index < title_itinerary.length; index++) {
-    //     await Package.updateOne(
-    //       {
-    //         _id: id,
-    //       },
-    //       {
-    //         itinerary: ItineraryArray,
-    //       }
-    //     );
-    //   }
-    // } else {
-    //   let itineraryItem = {
-    //     title_itinerary: title_itinerary,
-    //     content_itinerary: content_itinerary,
-    //   };
-    //   console.log("itineraryItem = ", itineraryItem);
-    //   await Package.updateOne(
-    //     {
-    //       _id: id,
-    //     },
-    //     {
-    //       itinerary: itineraryItem,
-    //     }
-    //   );
-    // }
+    // console.log({ newData: cover_itinerary });
+
+    if (Array.isArray(title_itinerary)) {
+      for (let index = 0; index < title_itinerary.length; index++) {
+        await Package.updateOne(
+          {
+            _id: id,
+          },
+          {
+            itinerary: ItineraryArray,
+          }
+        );
+      }
+    } else {
+      let itineraryItem = {
+        title_itinerary: title_itinerary,
+        cover_itinerary: cover_itinerary,
+        content_itinerary: content_itinerary,
+      };
+      await Package.updateOne(
+        {
+          _id: id,
+        },
+        {
+          itinerary: itineraryItem,
+        }
+      );
+    }
 
     // Pocket
     let PocketArray = [];
