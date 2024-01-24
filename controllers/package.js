@@ -379,35 +379,30 @@ exports.UpdatePackage = async (req, res, next) => {
         );
       } else if (typeof cover_itinerary === "string") {
         // console.log("22222");
+        // console.log({ files2 });
         // let OldItinerary = ExistPackage.itinerary;
         // console.log("OldItinerary Start = ", OldItinerary);
-        // console.log({ OldItinerary });
         // console.log({ cover_itinerary_index });
+        // let ItineraryArray = [];
         // if (Array.isArray(title_itinerary)) {
-        // console.log("33333");
-        // for (let index = 0; index < title_itinerary?.length; index++) {
-        //   if (OldItinerary[index]) {
-        //     OldItinerary[index].title_itinerary = title_itinerary[index];
-        //     OldItinerary[index].content_itinerary = content_itinerary[index];
+        //   for (let index = 0; index < title_itinerary.length; index++) {
+        //     ItineraryArray.push({
+        //       title_itinerary: title_itinerary[index],
+        //       cover_itinerary: cover_itinerary[index],
+        //       content_itinerary: content_itinerary[index],
+        //     });
         //   }
+        //   await Package.updateOne(
+        //     {
+        //       _id: id,
+        //     },
+        //     {
+        //       itinerary: OldItinerary,
+        //     }
+        //   );
+        //   console.log("OldItinerary End = ", OldItinerary);
         // }
-        // for (let index = 0; index < files2?.length; index++) {
-        //   if (OldItinerary[parseInt(cover_itinerary_index[index])]) {
-        //     OldItinerary[
-        //       parseInt(cover_itinerary_index[index])
-        //     ].cover_itinerary = files2[index]?.filename;
-        //   }
-        // }
-        // await Package.updateOne(
-        //   {
-        //     _id: id,
-        //   },
-        //   {
-        //     itinerary: OldItinerary,
-        //   }
-        // );
-        // console.log("OldItinerary End = ", OldItinerary);
-        // } else {
+        // else {
         //   console.log("44444");
         //   let ItineraryItem = {
         //     title_itinerary,
@@ -425,27 +420,45 @@ exports.UpdatePackage = async (req, res, next) => {
         // }
       } else if (!cover_itinerary) {
         console.log("5555");
-        let ItineraryArray = [];
-        for (let index = 0; index < title_itinerary.length; index++) {
-          ItineraryArray.push({
-            title_itinerary: title_itinerary[index],
-            cover_itinerary: files2[index]?.filename,
-            content_itinerary: content_itinerary[index],
-          });
-        }
-
-        await Package.updateOne(
-          {
-            _id: id,
-          },
-          {
-            itinerary: ItineraryArray,
+        if (Array.isArray(title_itinerary)) {
+          let ItineraryArray = [];
+          for (let index = 0; index < title_itinerary.length; index++) {
+            ItineraryArray.push({
+              title_itinerary: title_itinerary[index],
+              cover_itinerary: files2[index]?.filename,
+              content_itinerary: content_itinerary[index],
+            });
           }
-        );
+
+          await Package.updateOne(
+            {
+              _id: id,
+            },
+            {
+              itinerary: ItineraryArray,
+            }
+          );
+        } else {
+          console.log("1000000");
+          let ItineraryItem = {
+            title_itinerary,
+            cover_itinerary: files2[0].filename,
+            content_itinerary,
+          };
+          await Package.updateOne(
+            {
+              _id: id,
+            },
+            {
+              itinerary: ItineraryItem,
+            }
+          );
+        }
       }
     } else if (!files2) {
       console.log("66666");
       if (Array.isArray(title_itinerary)) {
+        console.log("77777");
         let ItineraryArray = [];
         for (let index = 0; index < title_itinerary.length; index++) {
           ItineraryArray.push({
@@ -464,7 +477,7 @@ exports.UpdatePackage = async (req, res, next) => {
           }
         );
       } else {
-        console.log("77777");
+        console.log("88888");
         let ItineraryItem = {
           title_itinerary,
           cover_itinerary,
