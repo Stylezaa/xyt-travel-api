@@ -110,53 +110,65 @@ exports.Insert = async (req, res) => {
 exports.Update = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { images, images_index } = req.body;
+    const files = req.files["images"] || null;
 
-    const { enabled } = req.body;
-
-    const files = req.files["images"];
-
-    if (!files) {
+    // Check ID has found ?
+    const ExistSlider = await Slider.findById(id);
+    if (!ExistSlider) {
       return res.status(404).send({
-        message: "Not Found Images",
+        message: "ບໍ່ພົບ Slider ນີ້",
         status: 404,
       });
     }
 
-    let imagePaths = [];
+    let ImagesArray = [];
+    if (files?.length > 0) {
+      if (typeof images === "object") {
+        for (let index = 0; index < files?.length; index++) {
+          images.splice(
+            parseInt(images_index[index]),
+            0,
+            files[index]?.filename
+          );
+        }
 
-    if (files) {
-      files.map((file) => {
-        imagePaths.push(`${file.filename}`);
-      });
+        for (let index = 0; index < images.length; index++) {
+          ImagesArray.push(images[index]);
+        }
+      }
+      if (typeof images === "string") {
+        ImagesArray.splice(0, 0, images);
+        for (let index = 0; index < files.length; index++) {
+          ImagesArray.push(files[index].filename);
+        }
+      } else if (!images) {
+        for (let index = 0; index < files?.length; index++) {
+          ImagesArray.push(files[index].filename);
+        }
+      }
+    } else if (!files) {
+      if (typeof images === "string") {
+        ImagesArray.push(images);
+      } else if (typeof images === "object") {
+        for (let index = 0; index < images?.length; index++) {
+          ImagesArray.push(images[index]);
+        }
+      }
     }
-
-    // check id has found ?
-    const existSlider = await Slider.findById(id);
-    if (!existSlider) {
-      return res.status(503).send({
-        message: "This ID Not Found",
-        status: 503,
-      });
-    }
-
     await Slider.updateOne(
       {
         _id: id,
       },
       {
-        images: imagePaths,
+        images: ImagesArray,
       }
     );
-
-    if (enabled) {
-      Slider.enabled = req.body.enabled;
-    }
 
     res.status(200).send({
       message: "Update This Slider Successfully",
       status: 200,
     });
-    // }
   } catch (error) {
     console.log(error);
     res.status(500).send({
