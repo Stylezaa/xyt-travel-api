@@ -1,98 +1,99 @@
-const Package = require('../models/package')
+const Package = require("../models/package");
 
 exports.GetPackageAll = async (req, res) => {
   try {
     let package = await Package.find()
-      .populate({ path: 'users_booking' })
-      .populate({ path: 'category' })
-      .sort({ createdAt: -1 })
+      .populate({ path: "users_booking" })
+      .populate({ path: "category" })
+      .sort({ createdAt: -1 });
 
-    const basePath = `${req.protocol}://${req.get('host')}/uploads/packages/`
+    const basePath = `${req.protocol}://${req.get("host")}/uploads/packages/`;
 
     if (package.length === 0) {
       return res.status(404).send({
-        message: 'Not Found Any Package',
+        message: "Not Found Any Package",
         status: 404,
-      })
+      });
     }
 
     res.status(200).send({
       message: package,
       url: basePath,
       status: 200,
-    })
+    });
   } catch (error) {
     res.status(500).send({
       message: error,
       status: 500,
-    })
+    });
   }
-}
+};
 
 exports.GetPackageByCate = async (req, res) => {
   try {
-    const { category } = req.query
+    const { category } = req.query;
     let package = await Package.find()
       .populate({
-        path: 'users_booking',
+        path: "users_booking",
       })
       .populate({
-        path: 'category',
+        path: "category",
         match: {
           cate_name: category,
         },
       })
       .sort({ createdAt: -1 })
       .then((data) => {
-        return data.filter((parent) => parent.category !== null)
-      })
+        return data.filter((parent) => parent.category !== null);
+      });
 
-    const basePath = `${req.protocol}://${req.get('host')}/uploads/packages/`
+    const basePath = `${req.protocol}://${req.get("host")}/uploads/packages/`;
 
     if (package.length === 0) {
       return res.status(404).send({
-        message: 'Not Found Any Package',
+        message: "Not Found Any Package",
         status: 404,
-      })
+      });
     }
 
     res.status(200).send({
       message: package,
       url: basePath,
       status: 200,
-    })
+    });
   } catch (error) {
     res.status(500).send({
       message: error,
       status: 500,
-    })
+    });
   }
-}
+};
 
 exports.GetPackageByID = async (req, res) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
+    console.log({ id });
     let packageOne = await Package.findOne({ _id: id })
-      .populate('users_booking')
-      .populate({ path: 'category' })
-      .exec()
+      .populate("users_booking")
+      .populate({ path: "category" })
+      .exec();
     if (!packageOne) {
       return res.status(404).send({
-        message: 'Not Found This Package',
+        message: "Not Found This Package",
         status: 404,
-      })
+      });
     }
     res.status(200).send({
       message: packageOne,
       status: 200,
-    })
+    });
   } catch (err) {
     res.status(500).send({
       message: err,
       status: 500,
-    })
+    });
   }
-}
+};
 
 exports.Insert = async (req, res) => {
   try {
@@ -118,9 +119,9 @@ exports.Insert = async (req, res) => {
       meals_pocket,
       booking_policy,
       enabled,
-    } = req.body
+    } = req.body;
 
-    console.log({ activities_pocket })
+    console.log({ activities_pocket });
 
     // const files1 = req.files['cover'][0]
     // const files2 = req.files['cover_itinerary']
@@ -259,17 +260,17 @@ exports.Insert = async (req, res) => {
     //   status: 201,
     // })
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
       message: error,
       status: 500,
-    })
+    });
   }
-}
+};
 
 exports.UpdatePackage = async (req, res, next) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
 
     const {
       title,
@@ -298,18 +299,18 @@ exports.UpdatePackage = async (req, res, next) => {
 
       booking_policy,
       enabled,
-    } = req.body
+    } = req.body;
 
-    const files1 = (req.files['cover'] && req.files['cover'][0]) || null
-    const files2 = req.files['cover_itinerary'] || null
+    const files1 = (req.files["cover"] && req.files["cover"][0]) || null;
+    const files2 = req.files["cover_itinerary"] || null;
 
     // Check ID has found ?
-    const ExistPackage = await Package.findById(id)
+    const ExistPackage = await Package.findById(id);
     if (!ExistPackage) {
       return res.status(404).send({
-        message: 'ບໍ່ພົບ Package ນີ້',
+        message: "ບໍ່ພົບ Package ນີ້",
         status: 404,
-      })
+      });
     }
 
     await Package.updateOne(
@@ -330,7 +331,7 @@ exports.UpdatePackage = async (req, res, next) => {
         booking_policy,
         enabled,
       }
-    )
+    );
 
     if (files1) {
       await Package.updateOne(
@@ -340,7 +341,7 @@ exports.UpdatePackage = async (req, res, next) => {
         {
           cover: files1.filename,
         }
-      )
+      );
     }
 
     if (recommend_for) {
@@ -349,25 +350,25 @@ exports.UpdatePackage = async (req, res, next) => {
           _id: id,
         },
         { $push: { recommend_for: recommend_for } }
-      )
+      );
     }
 
     if (files2?.length > 0) {
-      if (typeof cover_itinerary === 'object') {
-        let ItineraryArray = []
+      if (typeof cover_itinerary === "object") {
+        let ItineraryArray = [];
         for (let index = 0; index < files2?.length; index++) {
           cover_itinerary.splice(
             parseInt(cover_itinerary_index[index]),
             0,
             files2[index]?.filename
-          )
+          );
         }
         for (let index = 0; index < title_itinerary.length; index++) {
           ItineraryArray.push({
             title_itinerary: title_itinerary[index],
             cover_itinerary: cover_itinerary[index],
             content_itinerary: content_itinerary[index],
-          })
+          });
         }
 
         await Package.updateOne(
@@ -377,20 +378,20 @@ exports.UpdatePackage = async (req, res, next) => {
           {
             itinerary: ItineraryArray,
           }
-        )
-      } else if (typeof cover_itinerary === 'string') {
-        let ItineraryImage = []
-        ItineraryImage.splice(0, 0, cover_itinerary)
+        );
+      } else if (typeof cover_itinerary === "string") {
+        let ItineraryImage = [];
+        ItineraryImage.splice(0, 0, cover_itinerary);
         for (let index = 0; index < files2.length; index++) {
-          ItineraryImage.push(files2[index].filename)
+          ItineraryImage.push(files2[index].filename);
         }
-        let ItineraryArray = []
+        let ItineraryArray = [];
         for (let index = 0; index < ItineraryImage.length; index++) {
           ItineraryArray.push({
             title_itinerary: title_itinerary[index],
             cover_itinerary: ItineraryImage[index],
             content_itinerary: content_itinerary[index],
-          })
+          });
         }
 
         await Package.updateOne(
@@ -400,16 +401,16 @@ exports.UpdatePackage = async (req, res, next) => {
           {
             itinerary: ItineraryArray,
           }
-        )
+        );
       } else if (!cover_itinerary) {
         if (Array.isArray(title_itinerary)) {
-          let ItineraryArray = []
+          let ItineraryArray = [];
           for (let index = 0; index < title_itinerary.length; index++) {
             ItineraryArray.push({
               title_itinerary: title_itinerary[index],
               cover_itinerary: files2[index]?.filename,
               content_itinerary: content_itinerary[index],
-            })
+            });
           }
 
           await Package.updateOne(
@@ -419,13 +420,13 @@ exports.UpdatePackage = async (req, res, next) => {
             {
               itinerary: ItineraryArray,
             }
-          )
+          );
         } else {
           let ItineraryItem = {
             title_itinerary,
             cover_itinerary: files2[0].filename,
             content_itinerary,
-          }
+          };
           await Package.updateOne(
             {
               _id: id,
@@ -433,18 +434,18 @@ exports.UpdatePackage = async (req, res, next) => {
             {
               itinerary: ItineraryItem,
             }
-          )
+          );
         }
       }
     } else if (!files2) {
       if (Array.isArray(title_itinerary)) {
-        let ItineraryArray = []
+        let ItineraryArray = [];
         for (let index = 0; index < title_itinerary.length; index++) {
           ItineraryArray.push({
             title_itinerary: title_itinerary[index],
             cover_itinerary: cover_itinerary[index],
             content_itinerary: content_itinerary[index],
-          })
+          });
         }
 
         await Package.updateOne(
@@ -454,13 +455,13 @@ exports.UpdatePackage = async (req, res, next) => {
           {
             itinerary: ItineraryArray,
           }
-        )
+        );
       } else {
         let ItineraryItem = {
           title_itinerary,
           cover_itinerary,
           content_itinerary,
-        }
+        };
         await Package.updateOne(
           {
             _id: id,
@@ -468,19 +469,19 @@ exports.UpdatePackage = async (req, res, next) => {
           {
             itinerary: ItineraryItem,
           }
-        )
+        );
       }
     }
 
     // Pocket
-    let PocketArray = []
+    let PocketArray = [];
     for (let index = 0; index < title_pocket.length; index++) {
       PocketArray.push({
         title_pocket: title_pocket[index],
         activities_pocket: activities_pocket[index],
         where_to_stay_pocket: where_to_stay_pocket[index],
         meals_pocket: meals_pocket[index],
-      })
+      });
     }
 
     if (Array.isArray(title_pocket)) {
@@ -492,7 +493,7 @@ exports.UpdatePackage = async (req, res, next) => {
           {
             pocket_summary: PocketArray,
           }
-        )
+        );
       }
     } else {
       let PocketItem = {
@@ -500,7 +501,7 @@ exports.UpdatePackage = async (req, res, next) => {
         activities_pocket,
         where_to_stay_pocket,
         meals_pocket,
-      }
+      };
       await Package.updateOne(
         {
           _id: id,
@@ -508,44 +509,44 @@ exports.UpdatePackage = async (req, res, next) => {
         {
           pocket_summary: PocketItem,
         }
-      )
+      );
     }
 
     res.status(200).json({
-      message: 'ອັບເດດ Package ສໍາເລັດ',
+      message: "ອັບເດດ Package ສໍາເລັດ",
       status: 200,
-    })
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
       message: error,
       status: 500,
-    })
+    });
   }
-}
+};
 
 exports.DeletePackageById = async (req, res, next) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
 
-    const dataOne = await Package.deleteOne({ _id: id })
+    const dataOne = await Package.deleteOne({ _id: id });
 
     if (!dataOne) {
       return res.status(404).send({
-        message: 'Not Found This Package Item',
+        message: "Not Found This Package Item",
         status: 404,
-      })
+      });
     }
 
     res.status(200).send({
-      message: 'Delete This Package Successfully',
+      message: "Delete This Package Successfully",
       status: 200,
-    })
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
       message: error,
       status: 500,
-    })
+    });
   }
-}
+};
