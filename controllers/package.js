@@ -121,144 +121,142 @@ exports.Insert = async (req, res) => {
       enabled,
     } = req.body;
 
-    console.log({ activities_pocket });
+    const files1 = req.files["cover"][0];
+    const files2 = req.files["cover_itinerary"];
 
-    // const files1 = req.files['cover'][0]
-    // const files2 = req.files['cover_itinerary']
+    if (!files1 || files2.length === 0) {
+      return res.status(404).send({
+        message: "ໄຟຮຮູບພາບບໍ່ຄົບຖ້ວນ",
+        status: 404,
+      });
+    }
 
-    // if (!files1 || files2.length === 0) {
-    //   return res.status(404).send({
-    //     message: 'ໄຟຮຮູບພາບບໍ່ຄົບຖ້ວນ',
-    //     status: 404,
-    //   })
-    // }
+    let ItineraryArray = [];
+    for (let index = 0; index < files2.length; index++) {
+      ItineraryArray.push({
+        title_itinerary: title_itinerary[index],
+        cover_itinerary: files2[index].filename,
+        content_itinerary: content_itinerary[index],
+      });
+    }
 
-    // let ItineraryArray = []
-    // for (let index = 0; index < files2.length; index++) {
-    //   ItineraryArray.push({
-    //     title_itinerary: title_itinerary[index],
-    //     cover_itinerary: files2[index].filename,
-    //     content_itinerary: content_itinerary[index],
-    //   })
-    // }
+    let PocketArray = [];
+    for (let index = 0; index < title_pocket.length; index++) {
+      PocketArray.push({
+        title_pocket: title_pocket[index],
+        activities_pocket: activities_pocket[index],
+        where_to_stay_pocket: where_to_stay_pocket[index],
+        meals_pocket: meals_pocket[index],
+      });
+    }
 
-    // let PocketArray = []
-    // for (let index = 0; index < title_pocket.length; index++) {
-    //   PocketArray.push({
-    //     title_pocket: title_pocket[index],
-    //     activities_pocket: activities_pocket[index],
-    //     where_to_stay_pocket: where_to_stay_pocket[index],
-    //     meals_pocket: meals_pocket[index],
-    //   })
-    // }
+    let package = new Package({
+      title,
+      price,
+      category,
+      duration_tour,
+      start_tour,
+      end_tour,
+      cities_tour,
+      min_tour,
+      max_tour,
+      trip_overview,
+      booking_policy,
+      enabled,
+    });
 
-    // let package = new Package({
-    //   title,
-    //   price,
-    //   category,
-    //   duration_tour,
-    //   start_tour,
-    //   end_tour,
-    //   cities_tour,
-    //   min_tour,
-    //   max_tour,
-    //   trip_overview,
-    //   booking_policy,
-    //   enabled,
-    // })
+    await package.save(); // Save to database
 
-    // await package.save() // Save to database
+    if (enabled) {
+      package.enabled = req.body.enabled;
+    }
 
-    // if (enabled) {
-    //   package.enabled = req.body.enabled
-    // }
+    if (recommend_for) {
+      await Package.updateOne(
+        {
+          _id: package._id,
+        },
+        { $push: { recommend_for: recommend_for } }
+      );
+    }
 
-    // if (recommend_for) {
-    //   await Package.updateOne(
-    //     {
-    //       _id: package._id,
-    //     },
-    //     { $push: { recommend_for: recommend_for } }
-    //   )
-    // }
+    if (files1) {
+      await Package.updateOne(
+        {
+          _id: package._id,
+        },
+        {
+          cover: files1.filename,
+        }
+      );
+    }
 
-    // if (files1) {
-    //   await Package.updateOne(
-    //     {
-    //       _id: package._id,
-    //     },
-    //     {
-    //       cover: files1.filename,
-    //     }
-    //   )
-    // }
+    if (Array.isArray(title_itinerary)) {
+      for (let index = 0; index < title_itinerary.length; index++) {
+        await Package.updateOne(
+          {
+            _id: package._id,
+          },
+          {
+            itinerary: ItineraryArray,
+          }
+        );
+      }
+    } else {
+      let itineraryItem = {
+        title_itinerary: title_itinerary,
+        content_itinerary: content_itinerary,
+        cover_itinerary: files2[0].filename,
+      };
+      await Package.updateOne(
+        {
+          _id: package._id,
+        },
+        {
+          itinerary: itineraryItem,
+        }
+      );
+    }
 
-    // if (Array.isArray(title_itinerary)) {
-    //   for (let index = 0; index < title_itinerary.length; index++) {
-    //     await Package.updateOne(
-    //       {
-    //         _id: package._id,
-    //       },
-    //       {
-    //         itinerary: ItineraryArray,
-    //       }
-    //     )
-    //   }
-    // } else {
-    //   let itineraryItem = {
-    //     title_itinerary: title_itinerary,
-    //     content_itinerary: content_itinerary,
-    //     cover_itinerary: files2[0].filename,
-    //   }
-    //   await Package.updateOne(
-    //     {
-    //       _id: package._id,
-    //     },
-    //     {
-    //       itinerary: itineraryItem,
-    //     }
-    //   )
-    // }
+    if (Array.isArray(title_pocket)) {
+      for (let index = 0; index < title_pocket.length; index++) {
+        await Package.updateOne(
+          {
+            _id: package._id,
+          },
+          {
+            pocket_summary: PocketArray,
+          }
+        );
+      }
+    } else {
+      let PocketItem = {
+        title_pocket,
+        activities_pocket,
+        where_to_stay_pocket,
+        meals_pocket,
+      };
+      await Package.updateOne(
+        {
+          _id: package._id,
+        },
+        {
+          pocket_summary: PocketItem,
+        }
+      );
+    }
 
-    // if (Array.isArray(title_pocket)) {
-    //   for (let index = 0; index < title_pocket.length; index++) {
-    //     await Package.updateOne(
-    //       {
-    //         _id: package._id,
-    //       },
-    //       {
-    //         pocket_summary: PocketArray,
-    //       }
-    //     )
-    //   }
-    // } else {
-    //   let PocketItem = {
-    //     title_pocket,
-    //     activities_pocket,
-    //     where_to_stay_pocket,
-    //     meals_pocket,
-    //   }
-    //   await Package.updateOne(
-    //     {
-    //       _id: package._id,
-    //     },
-    //     {
-    //       pocket_summary: PocketItem,
-    //     }
-    //   )
-    // }
+    if (!package) {
+      return res.status(404).send({
+        message: "Not Found Any Data",
+        status: 404,
+      });
+    }
 
-    // if (!package) {
-    //   return res.status(404).send({
-    //     message: 'Not Found Any Data',
-    //     status: 404,
-    //   })
-    // }
-
-    // res.status(201).send({
-    //   message: 'Insert Product Successfully',
-    //   status: 201,
-    // })
+    res.status(201).send({
+      message: "Insert Product Successfully",
+      status: 201,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
